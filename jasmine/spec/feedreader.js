@@ -62,6 +62,7 @@ $(function() {
          */
          it('is hidden by default', function() {
             //expect($('body.menu-hidden').count()).toEqual(1);
+            expect($('body').hasClass('menu-hidden')).toBeTruthy();
          });
 
          /* TODO: Write a test that ensures the menu changes
@@ -70,7 +71,11 @@ $(function() {
           * clicked and does it hide when clicked again.
           */
          it('changes visibility when clicked', function() {
+            $('.menu-icon-link').click();
+            expect($('body').hasClass('menu-hidden')).toBeFalsy();
 
+            $('.menu-icon-link').click();
+            expect($('body').hasClass('menu-hidden')).toBeTruthy();
          });
 
     });
@@ -83,8 +88,12 @@ $(function() {
          * Remember, loadFeed() is asynchronous so this test wil require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
-         it('has at least a single feed', function() {
+         beforeEach(function(done) {
+             loadFeed(0, done);
+         });
 
+         it('has at least a single feed', function() {
+             expect($('.feed').children().length).toBeGreaterThan(0);
          });
     });
 
@@ -94,8 +103,19 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
-         it('changes content when new feed loaded', function() {
+         var articles;
 
+         function cb() {
+             articles = $('.feed').html();
+         }
+
+         beforeEach(function(done) {
+             loadFeed(0, cb);
+             loadFeed(1, done);
+         });
+
+         it('changes content when new feed loaded', function() {
+             expect(articles).not.toEqual($('.feed').html());
          });
     });
 }());
